@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>현자 챌린지 • 1000일의 마법사</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap');
+        
+        :root {
+            --primary: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+        }
+        
+        .app-container {
+            max-width: 420px;
+            margin: 0 auto;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+            border: 1px solid #27272a;
+        }
+
+        .wizard-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .modern-card {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-card:hover {
+            border-color: #3f3f46;
+            transform: translateY(-1px);
+        }
+
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .option-card.selected {
+            border-color: #6366f1;
+            background-color: #27272a;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-button {
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .nav-button:active {
+            transform: scale(0.97);
+        }
+
+        .step-dot {
+            transition: all 0.3s ease;
+        }
+
+        .progress-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .premium-shadow {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3),
+                        0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+
+        .sage-text {
+            background: linear-gradient(to right, #c026ff, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .metric-number {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "ss02";
+        }
+
+        .checkin-btn {
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        
+        .checkin-btn:active {
+            transform: scale(0.96);
+        }
+
+        .milestone-badge {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .toast {
+            animation: toast-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes toast-pop {
+            0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .survey-option {
+            user-select: none;
+        }
+
+        .app-header {
+            backdrop-filter: blur(20px);
+        }
+
+        .magic-glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100">
+    <!-- Phone Frame Container -->
+    <div class="min-h-screen flex items-center justify-center p-4 bg-zinc-950">
+        <div class="app-container w-full max-w-[420px] bg-zinc-900 rounded-[3.25rem] overflow-hidden border border-zinc-800 flex flex-col min-h-[720px] shadow-2xl">
+            
+            <!-- Status Bar -->
+            <div class="h-11 bg-zinc-950 flex items-center justify-between px-6 text-[11px] font-medium text-zinc-400">
+                <div>09:41</div>
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-signal text-xs"></i>
+                    <i class="fa-solid fa-wifi text-xs"></i>
+                    <div class="flex items-center gap-0.5">
+                        <span>92</span>
+                        <i class="fa-solid fa-battery-full text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Header -->
+            <div id="app-header" class="px-5 pt-4 pb-3 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between sticky top-0 z-50">
+                <div class="flex items-center gap-x-3">
+                    <div onclick="goToDashboard()" 
+                         class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center cursor-pointer shadow-inner">
+                        <i class="fa-solid fa-hat-wizard text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-xl tracking-tighter">현자 챌린지</div>
+                        <div class="text-[10px] text-zinc-500 -mt-1">1000일의 마법사</div>
+                    </div>
+                </div>
+                <div id="header-actions" class="flex items-center gap-2">
+                    <!-- Dynamic header content -->
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div id="main-content" class="flex-1 overflow-y-auto p-5 bg-zinc-900">
+                <!-- Screens will be injected here by JS -->
+            </div>
+
+            <!-- Bottom Safe Area -->
+            <div class="h-5 bg-zinc-900"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 items-center"></div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind Script
+        function initializeTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'sans': ['Inter', 'Noto Sans KR', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // App State
+        let currentView = 'splash';
+        let survey1Selected = [];
+        let survey2Answer = null;
+        let testAnswers = [null, null, null]; // Q1, Q2, Q3
+        let currentTestStep = 0;
+        let challengeData = {
+            totalDays: 0,
+            currentStreak: 0,
+            lastCheckin: null,
+            history: [],
+            onboarded: false,
+            qualified: false
+        };
+
+        // Load from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('hyeonjaChallengeData');
+            if (saved) {
+                challengeData = JSON.parse(saved);
+            }
+        }
+
+        // Save to localStorage
+        function saveData() {
+            localStorage.setItem('hyeonjaChallengeData', JSON.stringify(challengeData));
+        }
+
+        // Show Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = '';
+            let bgColor = 'bg-zinc-800 border-zinc-700';
+            
+            if (type === 'success') {
+                icon = '<i class="fa-solid fa-check-circle text-emerald-400 mr-2"></i>';
+                bgColor = 'bg-emerald-900/90 border-emerald-700';
+            } else if (type === 'warning') {
+                icon = '<i class="fa-solid fa-exclamation-circle text-amber-400 mr-2"></i>';
+                bgColor = 'bg-amber-900/90 border-amber-700';
+            }
+            
+            toast.className = `toast flex items-center px-5 py-3.5 rounded-3xl border ${bgColor} text-sm shadow-xl max-w-[320px]`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    ${icon}
+                    <span class="font-medium">${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        // Confetti
+        function launchConfetti(count = 80) {
+            const colors = ['#6366f1', '#a855f7', '#22c55e', '#eab308'];
+            const container = document.body;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'fixed w-2 h-2 rounded-full pointer-events-none z-[200]';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = '-10px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.opacity = Math.random() * 0.8 + 0.4;
+                container.appendChild(particle);
+                
+                const duration = Math.random() * 2800 + 2200;
+                const angle = Math.random() * 80 - 20;
+                
+                particle.animate([
+                    { 
+                        transform: `translateY(0) rotate(0deg)`,
+                        opacity: particle.style.opacity 
+                    },
+                    { 
+                        transform: `translateY(${window.innerHeight + 100}px) rotate(${angle * 3}deg)`,
+                        opacity: 0 
+                    }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+        // Update Header
+        function updateHeader(view) {
+            const headerActions = document.getElementById('header-actions');
+            headerActions.innerHTML = '';
+            
+            if (view === 'splash' || view === 'onboarding') {
+                headerActions.innerHTML = `
+                    <div class="text-xs px-3 py-1 bg-zinc-800 rounded-2xl text-zinc-400 flex items-center">
+                        <i class="fa-solid fa-lock mr-1.5 text-xs"></i>
+                        <span class="font-medium">All Free</span>
+                    </div>
+                `;
+            } else if (view === 'dashboard') {
+                headerActions.innerHTML = `
+                    <button onclick="resetChallenge()" 
+                            class="flex items-center justify-center w-9 h-9 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 active:bg-zinc-700 transition-colors rounded-2xl">
+                        <i class="fa-solid fa-redo text-base"></i>
+                    </button>
+                `;
+            } else {
+                // Back button for onboarding steps
+                headerActions.innerHTML = `
+                    <button onclick="goBack()" 
+                            class="flex items-center gap-1.5 text-sm px-4 py-2 text-zinc-400 hover:text-white active:bg-zinc-800 transition-colors rounded-2xl font-medium">
+                        <i class="fa-solid fa-chevron-left"></i>
+                        <span>뒤로</span>
+                    </button>
+                `;
+            }
+        }
+
+        // Render Splash / Opening
+        function renderSplash() {
+            currentView = 'splash';
+            updateHeader('splash');
+            
+            const html = `
+                <div class="flex flex-col items-center justify-center min-h-[580px] text-center px-2">
+                    <!-- Hero -->
+                    <div class="mb-8">
+                        <div class="mx-auto w-20 h-20 bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-600 rounded-[2.25rem] flex items-center justify-center mb-6 shadow-2xl magic-glow">
+                            <i class="fa-solid fa-hat-wizard text-white text-[3.25rem]"></i>
+                        </div>
+                        
+                        <div class="text-4xl font-bold tracking-tighter mb-2">1000일의<br>마법사</div>
+                        <div class="text-xl text-zinc-400 font-light">금욕 챌린지</div>
+                    </div>
+
+                    <!-- Legend Story -->
+                    <div class="max-w-[300px] mx-auto mb-10">
+                        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 text-left">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="px-3 py-1 bg-violet-900/60 text-violet-300 text-xs font-semibold tracking-wider rounded-2xl">전설</div>
+                            </div>
+                            <p class="text-[15px] leading-relaxed text-zinc-300">
+                                1000일 금욕을 실천하면,<br>
+                                <span class="font-semibold text-white">마법사가 된다</span>는<br>
+                                사실이 있다는 전설이<br>
+                                전해져 내려오고 있다...
+                            </p>
+                        </div>
+                    </div>
+
+                    <button onclick="startOnboarding()"
+                            class="w-full max-w-[260px] py-4 bg-white text-zinc-950 font-semibold text-base rounded-3xl active:scale-[0.985] transition-all flex items-center justify-center gap-2 shadow-xl">
+                        <span>챌린지 시작하기</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <div class="mt-6 text-xs text-zinc-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-globe text-xs"></i>
+                        <span>100% 무료 • 영원히</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('main-content').innerHTML = html;
+        }
+
+        // Start Onboarding
+        function startOnboarding() {
+            currentView = 'onboarding';
+            currentTestStep = 0;
+            survey1Selected = [];
+            survey2Answer = null;
+            testAnswers = [null, null, null];
+            
+            renderSurvey1();
+        }
+
+        // Progress Bar for Onboarding
+        function renderProgress(current, total) {
+            const percent = (current / total) * 100;
+            return `
+                <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mb-6">
+                    <div class="bg-gradient-to-r from-indigo-500 to-violet-500 h-1.5 rounded-full transition-all duration-500" 
+                         style="width: ${percent}%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-zinc-500 mb-4 px-1">
+                    <div>STEP ${current} / ${total}</div>
+                    <div class="font-medium">${Math.round(percent)}%</div>
+                </div>
+            `;
+        }
+
+        // Survey 1: Do you know these people?
+        function renderSurvey1() {
+            currentView = 'survey1';
+            updateHeader('onboarding');
+            
+            const options = [
+                { id: 1, name: "카와키타 사이카", sub: "河北彩花" },
+                { id: 2, name: "세토 칸나", sub: "瀬戸環奈" },
+                { id: 3, name: "오구라 유나", sub: "小倉由菜" },
+                { id: 4, name: "미카미 유아", sub: "三上悠亜" },
+                { id: 5, name: "카나에 레논", sub: "叶恋音", danger: true },
+                { id: 6, name: "안리 오키타", sub: "沖田杏梨", mystery: true },
+                { id: 7, name: "형은 2D파야", sub: "나는 2D만 본다" },
+                { id: 8, name: "포기.", sub: "이 설문조사 포기" }
+            ];
+            
+            let html = `
+                <div>
+                    ${renderProgress(1, 6)}
+                    
+                    <div class="mb-6">
+                        <div class="section-title mb-1.5">설문조사 ①</div>
+                        <div class="text-xl font-semibold tracking-tight">당신은 이 사람을 아십니까?</div>
+                        <div class="text-sm text-zinc-400 mt-1">모두 고르세요 (다중 선택 가능)</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-2.5 mb-8">
+            `;
+            
+            options.forEach((opt, index) => {
+                const isSelected = survey1Selected.includes(index);
+                let extraClass = '';
+                let badge = '';
+                
+                if (opt.danger) {
+                    badge = `<span class="ml-auto text-[10px] px-2 py-px bg-red-900/70 text-red-400 rounded">위험</span>`;
+                } else if (opt.mystery) {
+                    badge = `<span class="ml-auto text-[10px] px-2 py-px bg-zinc-700 text-zinc-400 rounded">????????</span>`;
+                }
+                
+                html += `
+                    <div onclick="toggleSurvey1Option(${index}, this)"
+                         class="option-card survey-option flex items-center justify-between px-4 py-[15px] border ${isSelected ? 'selected border-indigo-500 bg-zinc-800' : 'border-zinc-700 bg-zinc-950'} rounded-3xl cursor-pointer active:scale-[0.985]">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-2xl bg-zinc-800 flex-shrink-0 flex items-center justify-center text-xs font-mono text-zinc-400">
+                                ${String(opt.id).padStart(2, '0')}
+                            </div>
+                            <div>
+                                <div class="font-medium text-[15px]">${opt.name}</div>
+                                <div class="text-xs text-zinc-500">${opt.sub}</div>
+                            </div>
+                        </div>
+                        ${badge}
+                        <div class="ml-3 flex-shrink-0">
+                            <i class="fa-solid ${isSelected ? 'fa-check-circle text-indigo-400' : 'fa-circle text-zinc-700'} text-xl"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    
+                    <button onclick="goToSurvey2()"
+                            class="w-full py-4 bg-white active:bg-zinc-200 transition-all text-zinc-950 font-semibold rounded-3xl flex items-center justify-center gap-2 text-base shadow-xl">
+                        다음으로
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button onclick="skipToTest()" class="text-xs text-zinc-500 hover:text-zinc-400 underline">설문 건너뛰고 바로 테스트하기</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('main-content').innerHTML = html;
+        }
+
+        function toggleSurvey1Option(index, element) {
+            const idx = survey1Selected.indexOf(index);
+            
+            if (idx > -1) {
+                survey1Selected.splice(idx, 1);
+                element.classList.remove('selected', 'border-indigo-500', 'bg-zinc-800');
+                element.classList.add('border-zinc-700', 'bg-zinc-950');
+                element.querySelector('i').classList.replace('fa-check-circle', 'fa-circle');
+                element.querySelector('i').classList.replace('text-indigo-400', 'text-zinc-700');
+            } else {
+                survey1Selected.push(index);
+                element.classList.add('selected', 'border-indigo-500', 'bg-zinc-800');
+                element.classList.remove('border-zinc-700', 'bg-zinc-950');
+                element.querySelector('i').classList.replace('fa-circle', 'fa-check-circle');
+                element.querySelector('i').classList.replace('text-zinc-700', 'text-indigo-400');
+            }
+        }
+
+        function goToSurvey2() {
+            renderSurvey2();
+        }
+
+        function skipToTest() {
+            survey1Selected = [];
+            survey2Answer = '보통';
+            renderTestQuestion(0);
+        }
+
+        // Survey 2: Porn frequency
+        function renderSurvey2() {
+            currentView = 'survey2';
+            updateHeader('onboarding');
+            
+            const frequencies = [
+                { value: '매우 자주', icon: 'fa-fire', color: 'text-red-400' },
+                { value: '자주', icon: 'fa-bolt', color: 'text-orange-400' },
+                { value: '보통', icon: 'fa-clock', color: 'text-amber-400' },
+                { value: '거의 안봄', icon: 'fa-moon', color: 'text-emerald-400' },
+                { value: '안봄', icon: 'fa-check-double', color: 'text-emerald-500' }
+            ];
+            
+            let html = `
+                <div>
+                    ${renderProgress(2, 6)}
+                    
+                    <div class="mb-6">
+                        <div class="section-title mb-1.5">설문조사 ②</div>
+                        <div class="text-xl font-semibold tracking-tight">음란물 시청을<br>얼마나 자주 하나요?</div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-8">
+            `;
+            
+            frequencies.forEach((freq, i) => {
+                const isSelected = survey2Answer === freq.value;
+                html += `
+                    <div onclick="selectFrequency('${freq.value}', this)"
+                         class="option-card flex items-center px-5 py-4 border ${isSelected ? 'border-indigo-500 bg-zinc-800' : 'border-zinc-700 bg-zinc-950'} rounded-3xl cursor-pointer active:scale-[0.985]">
+                        <div class="flex items-center flex-1">
+                            <i class="fa-solid ${freq.icon} ${freq.color} text-2xl w-8"></i>
+                            <div class="ml-4 font-medium text-[15.5px]">${freq.value}</div>
+                        </div>
+                        <div>
+                            <i class="fa-solid ${isSelected ? 'fa-check-circle text-indigo-400' : 'fa-circle text-zinc-700'} text-xl"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    
+                    <button onclick="goToTest()"
+                            class="w-full py-4 bg-white active:bg-zinc-200 transition-all text-zinc-950 font-semibold rounded-3xl flex items-center justify-center gap-2 text-base shadow-xl">
+                        다음으로
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('main-content').innerHTML = html;
+        }
+
+        function selectFrequency(value, element) {
+            survey2Answer = value;
+            
+            // Deselect all
+            document.querySelectorAll('#main-content .option-card').forEach(el => {
+                el.classList.remove('border-indigo-500', 'bg-zinc-800');
+                el.classList.add('border-zinc-700', 'bg-zinc-950');
+                const icon = el.querySelector('i.fa-check-circle, i.fa-circle');
+                if (icon) {
+                    icon.classList.replace('fa-check-circle', 'fa-circle');
+                    icon.classList.replace('text-indigo-400', 'text-zinc-700');
+                }
+            });
+            
+            // Select current
+            element.classList.add('border-indigo-500', 'bg-zinc-800');
+            element.classList.remove('border-zinc-700', 'bg-zinc-950');
+            const icon = element.querySelector('i.fa-circle');
+            if (icon) {
+                icon.classList.replace('fa-circle', 'fa-check-circle');
+                icon.classList.replace('text-zinc-700', 'text-indigo-400');
+            }
+        }
+
+        function goToTest() {
+            if (!survey2Answer) {
+                showToast('빈도를 선택해주세요', 'warning');
+                return;
+            }
+            renderTestQuestion(0);
+        }
+
+        // Test Questions
+        function renderTestQuestion(qIndex) {
+            currentView = 'test';
+            currentTestStep = qIndex;
+            updateHeader('onboarding');
+            
+            const questions = [
+                {
+                    num: 1,
+                    q: "오늘 모 성인 소설 사이트에서<br>신작이 올라왔다.<br>볼 것인가?",
+                    yesLabel: "네, 볼 것 같다",
+                    noLabel: "아니오, 안 볼 것이다"
+                },
+                {
+                    num: 2,
+                    q: "온리팬스, 팬트리, 팬딩,<br>알플레이, 히어하트, 패트리온<br>구독을 모두 해제할 자신이 있는가?",
+                    yesLabel: "네, 해제할 수 있다",
+                    noLabel: "아니오, 아직은..."
+                },
+                {
+                    num: 3,
+                    q: "돈을 당신 인생을 위해<br>성인 음란물이 아닌 다른 곳에<br>투자할 자신이 있는가?<br><span class='text-xs text-zinc-400'>(자기계발, 도전, 취미 등)</span>",
+                    yesLabel: "네, 투자할 수 있다",
+                    noLabel: "아니오, 음란물에 투자한다"
+                }
+            ];
+            
+            const q = questions[qIndex];
+            const totalSteps = 6;
+            const currentStepNum = 3 + qIndex;
+            
+            let html = `
+                <div>
+                    ${renderProgress(currentStepNum, totalSteps)}
+                    
+                    <div class="mb-7">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="px-3.5 py-1 bg-zinc-800 text-xs font-mono tracking-[1px] rounded-2xl text-zinc-400">자격 테스트 ${q.num}/3</div>
+                        </div>
+                        <div class="text-[22px] leading-tight font-semibold tracking-tighter">${q.q}</div>
+                    </div>
+                    
+                    <div class="space-y-3 mt-2">
+                        <!-- Yes Button -->
+                        <button onclick="answerTestQuestion(${qIndex}, '네')"
+                                class="w-full py-[19px] px-6 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 transition-all text-white font-semibold text-[15.5px] rounded-3xl flex items-center justify-center gap-3 shadow-xl">
+                            <i class="fa-solid fa-check text-lg"></i>
+                            <span>${q.yesLabel}</span>
+                        </button>
+                        
+                        <!-- No Button -->
+                        <button onclick="answerTestQuestion(${qIndex}, '아니오')"
+                                class="w-full py-[19px] px-6 bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-all text-white font-medium text-[15.5px] rounded-3xl flex items-center justify-center gap-3 border border-zinc-700">
+                            <i class="fa-solid fa-times text-lg"></i>
+                            <span>${q.noLabel}</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <div class="text-xs text-zinc-500">진지하게 답변해주세요. 당신의 미래가 달려있습니다.</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('main-content').innerHTML = html;
+        }
+
+        function answerTestQuestion(qIndex, answer) {
+            testAnswers[qIndex] = answer;
+            
+            if (qIndex < 2) {
+                // Go to next question
+                setTimeout(() => {
+                    renderTestQuestion(qIndex + 1);
+                }, 120);
+            } else {
+                // Last question answered → show result
+                setTimeout(() => {
+                    showQualificationResult();
+                }, 180);
+            }
+        }
+
+        // Qualification Result
+        function showQualificationResult() {
+            currentView = 'result';
+            updateHeader('onboarding');
+            
+            const isQualified = testAnswers[0] === '아니오' && 
+                               testAnswers[1] === '네' && 
+                               testAnswers[2] === '네';
+            
+            let html = '';
+            
+            if (isQualified) {
+                // QUALIFIED - Special congrats
+                html = `
+                    <div class="text-center pt-4">
+                        <div class="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mb-7 shadow-2xl">
+                            <i class="fa-solid fa-tachometer-alt text-white text-5xl"></i>
+                        </div>
+                        
+                        <div class="text-3xl font-bold tracking-tighter mb-2">축하합니다!</div>
+                        <div class="text-emerald-400 text-xl font-semibold mb-6">당신은 현자가 될 준비가 되었습니다.</div>
+                        
+                        <div class="max-w-[290px] mx-auto bg-zinc-950 border border-emerald-900/50 rounded-3xl p-6 text-left mb-8">
+                            <div class="text-sm leading-relaxed text-zinc-300">
+                                당신은 이제, <span class="font-semibold text-emerald-400">현자가 될 준비</span>를 하고 있으며<br>
+                                <span class="font-semibold">첫걸음마를 뗐습니다.</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="startChallenge(true)"
+                                class="w-full max-w-[260px] mx-auto py-4 bg-white text-zinc-950 font-bold text-base rounded-3xl flex items-center justify-center gap-2 active:scale-[0.985] shadow-2xl">
+                            <span>1000일 여정 시작하기</span>
+                            <i class="fa-solid fa-rocket"></i>
+                        </button>
+                        
+                        <div class="mt-5 text-xs text-zinc-500">이제부터 매일 체크인하며<br>진정한 마법사가 되어보세요.</div>
+                    </div>
+                `;
+                challengeData.qualified = true;
+            } else {
+                // NOT YET QUALIFIED
+                html = `
+                    <div class="text-center pt-3">
+                        <div class="mx-auto w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                            <i class="fa-solid fa-seedling text-4xl text-emerald-400"></i>
+                        </div>
+                        
+                        <div class="text-2xl font-bold tracking-tight mb-3">아직 준비가<br>조금 더 필요해요</div>
+                        
+                        <div class="max-w-[280px] mx-auto text-sm text-zinc-400 mb-8 leading-relaxed">
+                            하지만 괜찮습니다.<br>
+                            많은 현자들이 처음엔 흔들렸습니다.<br>
+                            지금부터 시작해도 충분히 마법사가 될 수 있어요.
+                        </div>
+                        
+                        <div class="bg-zinc-950 border border-zinc-700 rounded-3xl p-5 mb-7 text-left text-sm">
+                            <div class="font-medium mb-2 text-white">당신의 현재 상태</div>
+                            <div class="space-y-1 text-xs text-zinc-400">
+                                <div class="flex justify-between"><span>1번 문항</span> <span class="${testAnswers[0] === '아니오' ? 'text-emerald-400' : 'text-red-400'}">${testAnswers[0] || '-'}</span></div>
+                                <div class="flex justify-between"><span>2번 문항</span> <span class="${testAnswers[1] === '네' ? 'text-emerald-400' : 'text-red-400'}">${testAnswers[1] || '-'}</span></div>
+                                <div class="flex justify-between"><span>3번 문항</span> <span class="${testAnswers[2] === '네' ? 'text-emerald-400' : 'text-red-400'}">${testAnswers[2] || '-'}</span></div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="startChallenge(false)"
+                                class="w-full max-w-[260px] mx-auto py-4 bg-white text-zinc-950 font-semibold text-base rounded-3xl flex items-center justify-center gap-2 active:scale-[0.985] shadow-xl">
+                            <span>그래도 챌린지 시작하기</span>
+                        </button>
+                        
+                        <button onclick="restartOnboarding()" 
+                                class="mt-3 text-xs text-zinc-500 hover:text-zinc-300 underline">설문 다시 하기</button>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('main-content').innerHTML = html;
+            saveData();
+        }
+
+        function restartOnboarding() {
+            startOnboarding();
+        }
+
+        // Start the actual challenge
+        function startChallenge(qualified) {
+            challengeData.onboarded = true;
+            challengeData.qualified = qualified;
+            saveData();
+            
+            // Show success animation
+            if (qualified) {
+                launchConfetti(90);
+            }
+            
+            setTimeout(() => {
+                renderDashboard();
+                showToast(qualified ? '현자 여정이 시작되었습니다!' : '챌린지를 시작합니다. 포기하지 마세요!', 'success');
+            }, 650);
+        }
+
+        // Dashboard
+        function renderDashboard() {
+            currentView = 'dashboard';
+            updateHeader('dashboard');
+            
+            const progress = Math.min(challengeData.totalDays / 1000, 1);
+            const circumference = 2 * Math.PI * 88;
+            const dashoffset = circumference * (1 - progress);
+            
+            const today = new Date().toISOString().split('T')[0];
+            const alreadyCheckedToday = challengeData.lastCheckin === today;
+            
+            let html = `
+                <div class="pb-8">
+                    <!-- Hero Stats -->
+                    <div class="text-center mb-7">
+                        <div class="text-xs tracking-[1.5px] text-zinc-500 mb-1 font-medium">현재 달성</div>
+                        
+                        <!-- Progress Circle -->
+                        <div class="relative mx-auto w-[178px] h-[178px] mb-3">
+                            <svg width="178" height="178" class="transform -rotate-90">
+                                <!-- Background circle -->
+                                <circle cx="89" cy="89" r="88" fill="none" 
+                                        stroke="#27272a" stroke-width="13"/>
+                                <!-- Progress circle -->
+                                <circle cx="89" cy="89" r="88" fill="none" 
+                                        stroke="#6366f1" stroke-width="13"
+                                        stroke-dasharray="${circumference}"
+                                        stroke-dashoffset="${dashoffset}"
+                                        stroke-linecap="round"
+                                        class="progress-circle"/>
+                            </svg>
+                            
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <div>
+                                    <span class="metric-number text-6xl font-bold tracking-tighter">${challengeData.totalDays}</span>
+                                </div>
+                                <div class="text-sm text-zinc-400 -mt-1">/ 1000일</div>
+                                
+                                <div class="mt-1 text-xs px-3 py-px bg-zinc-800 rounded-2xl text-indigo-300 font-medium">
+                                    ${Math.round(progress * 100)}% 달성
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Streak -->
+                        <div class="flex items-center justify-center gap-x-2 mt-1">
+                            <div class="flex items-center bg-zinc-800 px-4 h-9 rounded-3xl">
+                                <i class="fa-solid fa-fire text-orange-400 mr-2"></i>
+                                <span class="font-semibold text-xl metric-number">${challengeData.currentStreak}</span>
+                                <span class="text-sm ml-1.5 text-zinc-400">일 연속</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Check-in Card -->
+                    <div class="modern-card rounded-3xl p-5 mb-6">
+                        <div class="flex items-center justify-between mb-4 px-1">
+                            <div>
+                                <div class="font-semibold">오늘의 체크인</div>
+                                <div class="text-xs text-zinc-500">${new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}</div>
+                            </div>
+                            ${alreadyCheckedToday ? 
+                                `<div class="px-3 py-1 bg-emerald-900/70 text-emerald-400 text-xs font-medium rounded-2xl flex items-center"><i class="fa-solid fa-check mr-1"></i> 완료</div>` : 
+                                ''}
+                        </div>
+                        
+                        ${!alreadyCheckedToday ? `
+                            <div class="text-sm text-zinc-300 mb-4 px-1">오늘 금욕에 성공하셨나요?</div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="performCheckin(true)"
+                                        class="checkin-btn py-3.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 transition-all rounded-3xl font-semibold flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-check"></i>
+                                    <span>네, 성공!</span>
+                                </button>
+                                
+                                <button onclick="performCheckin(false)"
+                                        class="checkin-btn py-3.5 bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-500 transition-all rounded-3xl font-medium flex items-center justify-center gap-2 text-sm border border-zinc-600">
+                                    <i class="fa-solid fa-times"></i>
+                                    <span>오늘은 실패...</span>
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="bg-emerald-900/20 border border-emerald-800 rounded-2xl p-4 text-center">
+                                <div class="text-emerald-400 font-medium flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check-double"></i> 
+                                    <span>오늘 이미 체크인 완료!</span>
+                                </div>
+                                <div class="text-xs text-emerald-300/70 mt-1">내일 다시 도전해주세요. 수고하셨습니다.</div>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- Milestones -->
+                    <div class="mb-6">
+                        <div class="flex items-baseline justify-between px-1 mb-3">
+                            <div class="font-semibold text-sm">마일스톤</div>
+                            <div onclick="showAllMilestones()" class="text-xs text-indigo-400 cursor-pointer">전체보기 →</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-5 gap-2">
+                            ${createMilestoneBadges()}
+                        </div>
+                    </div>
+
+                    <!-- Recent History -->
+                    <div>
+                        <div class="font-semibold text-sm px-1 mb-3">최근 기록</div>
+                        <div class="modern-card rounded-3xl p-4">
+                            ${renderRecentHistory()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('main-content').innerHTML = html;
+        }
+
+        function createMilestoneBadges() {
+            const milestones = [7, 30, 100, 365, 1000];
+            let html = '';
+            
+            milestones.forEach(days => {
+                const unlocked = challengeData.totalDays >= days;
+                const isNext = !unlocked && challengeData.totalDays < days && 
+                              (days === 7 || challengeData.totalDays >= milestones[milestones.indexOf(days) - 1] || days === 7);
+                
+                html += `
+                    <div onclick="celebrateMilestone(${days}, ${unlocked})" 
+                         class="milestone-badge aspect-square flex flex-col items-center justify-center rounded-2xl cursor-pointer ${unlocked ? 'bg-emerald-900/30 border border-emerald-700' : 'bg-zinc-950 border border-zinc-700'} text-center p-1.5 active:scale-95 transition-all">
+                        <div class="text-[10px] font-mono text-zinc-400">${days}일</div>
+                        <div class="mt-0.5">
+                            ${unlocked ? 
+                                `<i class="fa-solid fa-trophy text-emerald-400 text-xl"></i>` : 
+                                `<i class="fa-solid fa-lock text-zinc-600 text-lg"></i>`
+                            }
+                        </div>
+                        <div class="text-[9px] mt-px ${unlocked ? 'text-emerald-300' : 'text-zinc-500'}">
+                            ${unlocked ? '달성' : '미달성'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
+        function celebrateMilestone(days, unlocked) {
+            if (unlocked) {
+                launchConfetti(55);
+                showToast(`${days}일 달성! 진정한 현자에 한 걸음 더!`, 'success');
+            } else {
+                const needed = days - challengeData.totalDays;
+                showToast(`${needed}일만 더! ${days}일 마일스톤까지`, 'warning');
+            }
+        }
+
+        function showAllMilestones() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/90 z-[150] flex items-end';
+            modal.innerHTML = `
+                <div onclick="event.target.remove()" class="absolute inset-0"></div>
+                <div onclick="event.target.closest('.modal-content').classList.contains('modal-content') && event.stopImmediatePropagation()" 
+                     class="modal-content relative w-full max-w-[420px] mx-auto bg-zinc-900 rounded-t-3xl p-6 border-t border-zinc-700">
+                    <div class="flex justify-between mb-5 px-1">
+                        <div class="font-bold text-xl">마일스톤</div>
+                        <button onclick="this.closest('.fixed').remove()" class="text-zinc-400">닫기</button>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        ${[7,30,100,365,1000].map(d => {
+                            const u = challengeData.totalDays >= d;
+                            return `
+                                <div class="flex items-center justify-between px-4 py-3 bg-zinc-950 rounded-2xl border ${u ? 'border-emerald-700' : 'border-zinc-700'}">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid ${u ? 'fa-trophy text-emerald-400' : 'fa-lock text-zinc-500'} text-xl w-6"></i>
+                                        <div>
+                                            <span class="font-semibold">${d}일</span>
+                                            <span class="text-xs ml-1.5 text-zinc-400">달성</span>
+                                        </div>
+                                    </div>
+                                    <div class="${u ? 'text-emerald-400' : 'text-zinc-500'} text-xs font-medium">
+                                        ${u ? '완료' : (challengeData.totalDays >= d-1 ? '곧 달성!' : '진행중')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="text-xs text-center text-zinc-500 mt-6">1000일 달성 시 진짜 마법사가 됩니다 🧙‍♂️</div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function renderRecentHistory() {
+            if (!challengeData.history || challengeData.history.length === 0) {
+                return `
+                    <div class="text-center py-6 text-xs text-zinc-500">
+                        아직 체크인 기록이 없습니다.<br>
+                        오늘 첫 성공을 기록해보세요!
+                    </div>
+                `;
+            }
+            
+            const recent = [...challengeData.history].reverse().slice(0, 7);
+            
+            let html = `<div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">`;
+            
+            recent.forEach(dateStr => {
+                const d = new Date(dateStr);
+                const dayNum = d.getDate();
+                const month = d.getMonth() + 1;
+                
+                html += `
+                    <div class="flex-shrink-0 text-center w-9">
+                        <div class="text-[9px] text-zinc-500">${month}/${dayNum}</div>
+                        <div class="mt-1 w-8 h-8 mx-auto bg-emerald-900/70 border border-emerald-700 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-check text-emerald-400 text-sm"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            return html;
+        }
+
+        // Perform daily check-in
+        function performCheckin(success) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (challengeData.lastCheckin === today) {
+                showToast('오늘은 이미 체크인했습니다', 'warning');
+                return;
+            }
+            
+            if (success) {
+                // Success
+                const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                
+                if (challengeData.lastCheckin === yesterday) {
+                    challengeData.currentStreak += 1;
+                } else {
+                    challengeData.currentStreak = 1;
+                }
+                
+                challengeData.totalDays += 1;
+                challengeData.lastCheckin = today;
+                challengeData.history.push(today);
+                
+                // Keep history reasonable size
+                if (challengeData.history.length > 100) challengeData.history.shift();
+                
+                saveData();
+                launchConfetti(45);
+                
+                // Re-render dashboard
+                setTimeout(() => {
+                    renderDashboard();
+                    
+                    // Special messages
+                    if (challengeData.totalDays === 7) {
+                        showToast('7일 달성! 첫 마일스톤 돌파!', 'success');
+                    } else if (challengeData.totalDays === 30) {
+                        showToast('30일 달성! 당신은 진지합니다.', 'success');
+                    } else if (challengeData.totalDays === 100) {
+                        showToast('100일! 현자 후보에 올랐습니다 🔥', 'success');
+                    } else if (challengeData.totalDays === 365) {
+                        showToast('1년 달성! 전설이 시작됩니다.', 'success');
+                    } else if (challengeData.totalDays === 1000) {
+                        showToast('1000일 완주! 당신은 이제 진짜 마법사입니다! 🧙‍♂️', 'success');
+                        setTimeout(() => launchConfetti(200), 600);
+                    } else {
+                        showToast(`+1일! 현재 ${challengeData.totalDays}일째`, 'success');
+                    }
+                }, 180);
+                
+            } else {
+                // Fail
+                challengeData.currentStreak = 0;
+                challengeData.lastCheckin = today;
+                // Do not add to history or totalDays
+                
+                saveData();
+                renderDashboard();
+                showToast('괜찮아요. 내일부터 다시 시작하면 됩니다 💪', 'warning');
+            }
+        }
+
+        // Go back in onboarding
+        function goBack() {
+            if (currentView === 'survey2') {
+                renderSurvey1();
+            } else if (currentView === 'test' && currentTestStep > 0) {
+                renderTestQuestion(currentTestStep - 1);
+            } else if (currentView === 'test' && currentTestStep === 0) {
+                renderSurvey2();
+            } else if (currentView === 'result') {
+                // Go back to last test question
+                renderTestQuestion(2);
+            } else {
+                renderSplash();
+            }
+        }
+
+        // Go directly to dashboard (from header logo)
+        function goToDashboard() {
+            if (challengeData.onboarded) {
+                renderDashboard();
+            } else {
+                renderSplash();
+            }
+        }
+
+        // Reset everything
+        function resetChallenge() {
+            if (!confirm('정말 모든 진행 상황을 초기화하시겠습니까?')) return;
+            
+            localStorage.removeItem('hyeonjaChallengeData');
+            challengeData = {
+                totalDays: 0,
+                currentStreak: 0,
+                lastCheckin: null,
+                history: [],
+                onboarded: false,
+                qualified: false
+            };
+            
+            renderSplash();
+            showToast('데이터가 초기화되었습니다', 'warning');
+        }
+
+        // Keyboard support (ESC to go back)
+        function setupKeyboard() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (currentView === 'dashboard') {
+                        // Do nothing or show reset confirm
+                    } else {
+                        goBack();
+                    }
+                }
+                
+                if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+                    e.preventDefault();
+                    if (currentView === 'dashboard') {
+                        const btns = document.querySelectorAll('#main-content button');
+                        if (btns.length > 0) btns[0].focus();
+                    }
+                }
+            });
+            
+            // Prevent pull to refresh on mobile
+            document.body.style.overscrollBehavior = 'none';
+        }
+
+        // Initialize everything
+        function initializeApp() {
+            initializeTailwind();
+            loadData();
+            setupKeyboard();
+            
+            // Hide scrollbar style
+            const style = document.createElement('style');
+            style.innerHTML = `.scrollbar-hide::-webkit-scrollbar { display: none; } .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }`;
+            document.head.appendChild(style);
+            
+            // Boot the app
+            if (challengeData.onboarded && challengeData.totalDays >= 0) {
+                // Returning user → go straight to dashboard
+                setTimeout(() => {
+                    renderDashboard();
+                }, 80);
+            } else {
+                // New user
+                renderSplash();
+            }
+            
+            // Easter egg: Konami code for fun
+            let konami = [];
+            const pattern = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+            document.addEventListener('keydown', function(e) {
+                konami.push(e.key);
+                if (konami.length > pattern.length) konami.shift();
+                if (JSON.stringify(konami) === JSON.stringify(pattern)) {
+                    konami = [];
+                    if (currentView === 'dashboard') {
+                        launchConfetti(300);
+                        showToast('마법의 힘이 느껴집니다... +7일 보너스!', 'success');
+                        challengeData.totalDays += 7;
+                        challengeData.currentStreak += 7;
+                        saveData();
+                        setTimeout(renderDashboard, 1200);
+                    }
+                }
+            });
+            
+            console.log('%c[현자 챌린지] 고퀄리티 MVP 로드 완료. All Free.', 'color:#52525b');
+        }
+
+        // Boot
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
