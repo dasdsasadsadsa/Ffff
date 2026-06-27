@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>딸깍 배포 - 말 한마디로 앱 배포</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg-primary: #0d0d0d; --bg-secondary: #1a1a1a; --bg-card: #242424; --text-primary: #ffffff; --text-secondary: #a0a0a0; --accent: #6366f1; --success: #22c55e; --warning: #f59e0b; --danger: #ef4444; --border: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+    .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+    .hero { text-align: center; padding: 32px 0; }
+    .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 14px; color: var(--text-secondary); }
+    .card { background: var(--bg-card); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .card-description { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+    textarea { width: 100%; min-height: 120px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--text-primary); font-size: 15px; resize: vertical; font-family: inherit; }
+    textarea:focus { outline: none; border-color: var(--accent); }
+    input[type="text"], input[type="password"] { width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text-primary); font-size: 14px; margin-bottom: 12px; }
+    input:focus { outline: none; border-color: var(--accent); }
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.2s; touch-action: manipulation; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #a855f7); color: white; }
+    .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-small { padding: 8px 16px; font-size: 13px; width: auto; }
+    .selector-group { display: flex; gap: 8px; margin-bottom: 12px; }
+    .selector-btn { flex: 1; padding: 12px; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .selector-btn.active { border-color: var(--accent); color: var(--text-primary); background: rgba(99, 102, 241, 0.1); }
+    .collapsible-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 8px 0; }
+    .collapsible-content { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+    .collapsible-content.open { max-height: 1000px; }
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-safe { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .status-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .status-blocked { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+    .timeline { position: relative; padding: 20px 0; }
+    .timeline-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; opacity: 0.5; }
+    .timeline-item.completed { opacity: 1; }
+    .timeline-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .timeline-item.completed .timeline-dot { background: var(--success); border-color: var(--success); }
+    .timeline-item.completed .timeline-dot::after { content: '✓'; font-size: 12px; color: white; }
+    .progress-bar { height: 4px; background: var(--bg-secondary); border-radius: 2px; margin: 20px 0; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #a855f7); width: 0%; transition: width 0.3s; }
+    .result-section { display: none; }
+    .result-section.show { display: block; }
+    .result-url { background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin-bottom: 16px; word-break: break-all; font-size: 14px; }
+    .result-actions { display: flex; flex-direction: column; gap: 12px; }
+    .apk-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .label { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+    .hidden { display: none !important; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; }
+    .modal h3 { margin-bottom: 16px; font-size: 18px; }
+    .pwa-guide { background: var(--bg-secondary); padding: 16px; border-radius: 12px; margin: 16px 0; font-size: 14px; }
+    .pwa-guide ol { margin-left: 20px; margin-top: 8px; }
+    .pwa-guide li { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero"><h1>말 한마디로 앱 배포</h1><p>코드 생성부터 GitHub, 배포, PWA, APK 까지 딸깍</p></div>
+    <div id="mainForm">
+      <div class="card"><div class="card-title">앱 아이디어</div><div class="card-description">만들고 싶은 앱을 한 줄로 설명해주세요</div><textarea id="appIdea" placeholder="예: 동네 미용실 예약 노쇼 방지 앱 만들어줘"></textarea></div>
+      <div class="card">
+        <div class="collapsible-header" onclick="document.getElementById('materialsContent').classList.toggle('open')"><span class="card-title">프롬프트 / Skills 붙여넣기</span><span style="font-size:12px;color:var(--text-secondary)">▼</span></div>
+        <div class="card-description">다른 곳에서 가져온 프롬프트나 스킬을 붙여넣으면 AI 가 참고합니다. 몰라도 그냥 넘어가세요.</div>
+        <div id="materialsContent" class="collapsible-content">
+          <label class="label">외부 프롬프트 (있으면 붙여넣기)</label><textarea id="externalPrompt" placeholder="복사한 프롬프트를 여기에 붙여넣으세요" style="min-height:80px"></textarea>
+          <label class="label" style="margin-top:12px">외부 Skill (있으면 붙여넣기)</label><textarea id="externalSkill" placeholder="복사한 스킬 파일을 여기에 붙여넣으세요" style="min-height:80px"></textarea>
+          <button class="btn btn-secondary btn-small" onclick="checkMaterials()" style="margin-top:12px">짧게 검사</button>
+          <div id="materialStatus" style="margin-top:12px"></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">AI 모델 선택</div><div class="selector-group"><button class="selector-btn active" data-model="qwen" onclick="selectModel('qwen')">Qwen 3.7</button><button class="selector-btn" data-model="gemini" onclick="selectModel('gemini')">Gemini 3.5 Flash</button></div></div>
+      <div class="card"><div class="card-title">API 키 / 토큰</div><div class="card-description">키는 현재 배포에만 사용되며 저장되지 않습니다.</div><label class="label">LLM API Key</label><input type="password" id="llmApiKey" placeholder="선택한 모델의 API 키"><label class="label">GitHub Token</label><input type="password" id="githubToken" placeholder="ghp_..."><label class="label">Cloudflare API Token</label><input type="password" id="cloudflareToken" placeholder="Cloudflare Pages 배포용"><label class="label">Vercel Token (선택사항)</label><input type="password" id="vercelToken" placeholder="Vercel 배포용"><label class="label">Google Drive Token (선택사항)</label><input type="password" id="gdriveToken" placeholder="APK 저장용"></div>
+      <div class="card"><div class="card-title">배포 대상</div><div class="selector-group"><button class="selector-btn active" data-deploy="cloudflare" onclick="selectDeploy('cloudflare')">Cloudflare Pages</button><button class="selector-btn" data-deploy="vercel" onclick="selectDeploy('vercel')">Vercel</button></div></div>
+      <button class="btn btn-primary" onclick="startDeploy()">딸깍 배포</button>
+    </div>
+    <div id="progressSection" class="card hidden"><div class="card-title">배포 진행중</div><div class="progress-bar"><div class="progress-bar-fill" id="progressBar"></div></div><div class="timeline" id="timeline"></div></div>
+    <div id="resultSection" class="result-section card">
+      <div class="card-title">✨ 배포 완료!</div>
+      <label class="label">라이브 URL</label><div class="result-url" id="liveUrl"></div>
+      <div class="result-actions"><button class="btn btn-secondary" onclick="copyUrl()">링크 복사</button><button class="btn btn-secondary" onclick="shareResult()">공유하기</button><a class="btn btn-secondary" id="githubLink" href="#" target="_blank">GitHub 저장소</a><a class="btn btn-secondary" id="deployLink" href="#" target="_blank">배포 페이지</a></div>
+      <div class="pwa-guide"><strong>📱 PWA 설치 방법</strong><ol><li>브라우저 메뉴 (⋮ 또는 ⎇) 를 탭하세요</li><li>"홈 화면에 추가" 또는 "앱 설치"를 선택하세요</li><li>앱 아이콘이 홈 화면에 추가됩니다</li></ol></div>
+      <div class="apk-section"><div class="card-title">Android APK</div><div id="apkStatus" style="margin:12px 0"><span class="status-badge status-safe">APK 준비됨</span></div><button class="btn btn-secondary" onclick="downloadApk()">APK 다운로드</button><button class="btn btn-secondary" onclick="saveToGDrive()" style="margin-top:12px">Google Drive 에 저장</button><div class="pwa-guide" style="margin-top:12px"><strong>APK 설치 방법:</strong><br>1. 다운로드한 APK 파일을 탭하세요<br>2. "알 수 없는 앱" 권한을 허용하세요<br>3. 설치를 완료하세요</div></div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="errorModal"><div class="modal"><h3>⚠️ 오류</h3><p id="errorMessage"></p><button class="btn btn-primary" onclick="closeModal()" style="margin-top:16px">확인</button></div></div>
+  <script>
+    let selectedModel='qwen',selectedDeploy='cloudflare',materialCheckStatus={prompt:'safe',skill:'safe'};
+    function selectModel(m){selectedModel=m;document.querySelectorAll('[data-model]').forEach(b=>b.classList.toggle('active',b.dataset.model===m));}
+    function selectDeploy(d){selectedDeploy=d;document.querySelectorAll('[data-deploy]').forEach(b=>b.classList.toggle('active',b.dataset.deploy===d));}
+    async function checkMaterials(){const p=document.getElementById('externalPrompt').value,s=document.getElementById('externalSkill').value,d=document.getElementById('materialStatus');d.innerHTML='<span class="status-badge" style="background:rgba(99,102,241,0.15);color:var(--accent)">검사중...</span>';try{const r=await fetch('/api/check-material',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,skill:s})}),res=await r.json();if(res.status==='blocked'){materialCheckStatus={prompt:'blocked',skill:'blocked'};d.innerHTML='<span class="status-badge status-blocked">차단됨: '+(res.reason||'')+'</span>';}else if(res.status==='warning'){materialCheckStatus={prompt:'warning',skill:'warning'};d.innerHTML='<span class="status-badge status-warning">주의 필요: '+(res.reason||'')+'</span>';}else{materialCheckStatus={prompt:'safe',skill:'safe'};d.innerHTML='<span class="status-badge status-safe">안전해 보임</span>';}}catch(e){d.innerHTML='<span class="status-badge status-warning">검사 실패</span>';}}
+    async function startDeploy(){const idea=document.getElementById('appIdea').value.trim(),llmKey=document.getElementById('llmApiKey').value.trim(),ghToken=document.getElementById('githubToken').value.trim();if(!idea){showError('앱 아이디어를 입력해주세요.');return;}if(!llmKey){showError('LLM API 키를 입력해주세요.');return;}if(!ghToken){showError('GitHub 토큰을 입력해주세요.');return;}document.getElementById('mainForm').classList.add('hidden');document.getElementById('progressSection').classList.remove('hidden');const steps=['AI 코드 생성중','Skills/프롬프트 안전 검사중','프로젝트 파일 구성중','GitHub 저장소 생성중','GitHub 업로드중',(selectedDeploy==='cloudflare'?'Cloudflare':'Vercel')+' 배포중','PWA 적용중','Android APK 생성중','Signed APK 준비중','Google Drive 저장 준비중','공유 링크 생성 완료'];document.getElementById('timeline').innerHTML=steps.map((s,i)=>'<div class="timeline-item" id="timeline-'+i+'"><div class="timeline-dot"></div><div class="timeline-text">'+s+'</div></div>').join('');try{const extP=document.getElementById('externalPrompt').value,extS=document.getElementById('externalSkill').value,r=await fetch('/api/deploy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({appIdea:idea,model:selectedModel,deployTarget:selectedDeploy,llmApiKey:llmKey,githubToken:ghToken,cloudflareToken:document.getElementById('cloudflareToken').value,vercelToken:document.getElementById('vercelToken').value,gdriveToken:document.getElementById('gdriveToken').value,externalPrompt:materialCheckStatus.prompt!=='blocked'?extP:'',externalSkill:materialCheckStatus.skill!=='blocked'?extS:''})}),res=await r.json();if(!r.ok)throw new Error(res.error||'배포 중 오류 발생');for(let i=0;i<=res.currentStep&&i<steps.length;i++){document.getElementById('timeline-'+i).classList.add('completed');await new Promise(x=>setTimeout(x,200));}document.getElementById('progressSection').classList.add('hidden');document.getElementById('resultSection').classList.add('show');document.getElementById('liveUrl').textContent=res.liveUrl||'https://example-app.pages.dev';document.getElementById('githubLink').href=res.githubUrl||'#';document.getElementById('deployLink').href=res.deployUrl||'#';}catch(e){showError(e.message);document.getElementById('progressSection').classList.add('hidden');document.getElementById('mainForm').classList.remove('hidden');}}
+    function showError(m){document.getElementById('errorMessage').textContent=m;document.getElementById('errorModal').classList.add('show');}
+    function closeModal(){document.getElementById('errorModal').classList.remove('show');}
+    function copyUrl(){navigator.clipboard.writeText(document.getElementById('liveUrl').textContent).then(()=>alert('링크 복사됨!'));}
+    function shareResult(){const u=document.getElementById('liveUrl').textContent;if(navigator.share)navigator.share({title:'내 앱',url:u});else copyUrl();}
+    function downloadApk(){alert('APK 다운로드 시작 (데모)');}
+    function saveToGDrive(){alert('Google Drive 저장 시작 (데모)');}
+  </script>
+</body>
+</html>
