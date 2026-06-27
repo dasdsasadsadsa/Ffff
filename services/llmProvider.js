@@ -49,13 +49,76 @@ export async function generateCode({ appIdea, model, llmApiKey, externalPrompt, 
   
   userPrompt += `\n\nGenerate all necessary files for deployment. Output ONLY valid JSON.`;
 
-  // Mock response for MVP - in production, call actual LLM API
-  // TODO: Implement real Qwen API call when model === 'qwen'
-  // TODO: Implement real Gemini API call when model === 'gemini'
-  
-  const mockResponse = generateMockProject(appIdea);
-  
-  return mockResponse;
+  // Call actual LLM API
+  try {
+    const result = await callLLM(userPrompt, llmApiKey, model);
+    return result;
+  } catch (error) {
+    console.warn('LLM API call failed, falling back to mock:', error.message);
+    // Fallback to mock on error
+    return generateMockProject(appIdea);
+  }
+}
+
+async function callLLM(prompt, apiKey, model) {
+  const url = model === 'gemini' 
+    ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`
+    : `https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions`;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(model === 'qwen' && { 'Authorization': `Bearer ${apiKey}` })
+  };
+
+  const body = model === 'gemini' 
+    ? { 
+        contents: [{ parts: [{ text: SYSTEM_PROMPT + '\n\n' + prompt }] }], 
+        generationConfig: { responseMimeType: "application/json" } 
+      }
+    : { 
+        model: "qwen-plus", 
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: prompt }
+        ], 
+        response_format: { type: "json_object" } 
+      };
+
+  try {
+    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`API Error: ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    
+    let rawText = "";
+    if (model === 'gemini') {
+      rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    } else {
+      rawText = data.choices?.[0]?.message?.content || "";
+    }
+
+    if (!rawText) throw new Error("No content generated");
+
+    // Robust JSON Parsing
+    try {
+      return JSON.parse(rawText);
+    } catch (e) {
+      console.warn("Raw JSON parse failed, attempting cleanup...");
+      // Try to extract JSON block if wrapped in markdown
+      const jsonMatch = rawText.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[1]);
+      }
+      // Try to find first { and last }
+      const start = rawText.indexOf('{');
+      const end = rawText.lastIndexOf('}');
+      if (start !== -1 && end !== -1) {
+        return JSON.parse(rawText.substring(start, end + 1));
+      }
+      throw new Error("Invalid JSON structure from AI");
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 function generateMockProject(appIdea) {

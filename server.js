@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { checkMaterials } from './services/materialChecker.js';
 import { runPipeline } from './services/pipeline.js';
+import { generateCode } from './services/llmProvider.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -63,14 +64,20 @@ app.post('/api/generate-project', async (req, res) => {
       safeSkill = externalSkill || '';
     }
     
-    // TODO: Call actual LLM provider
-    // For now, return mock response
+    // Call LLM provider to generate code
+    const generatedProject = await generateCode({
+      appIdea,
+      model,
+      llmApiKey,
+      externalPrompt: safePrompt,
+      externalSkill: safeSkill
+    });
     
     res.json({
       success: true,
-      projectName: 'my-app',
-      description: `Generated app: ${appIdea}`,
-      files: [],
+      projectName: generatedProject.projectName,
+      description: generatedProject.description,
+      files: generatedProject.files,
       materialStatus: materialCheck
     });
   } catch (error) {
